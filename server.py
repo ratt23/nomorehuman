@@ -499,11 +499,11 @@ def get_login_page_html(error: str = None):
     error_html = f'<div class="error-msg">{error}</div>' if error else ''
     return f"""
     <!doctype html>
-    <html lang="en">
+    <html lang="id">
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Admin Login - no more human!!</title>
+        <title>Login - NO MORE HUMAN</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -543,17 +543,26 @@ def get_login_page_html(error: str = None):
             .logo-wrap {{
                 font-size: 2.5rem;
                 color: var(--primary-color);
-                margin-bottom: 20px;
+                margin-bottom: 15px;
             }}
             h2 {{
-                margin: 0 0 10px 0;
-                font-size: 1.5rem;
+                margin: 0 0 5px 0;
+                font-size: 1.8rem;
                 font-weight: 700;
+                letter-spacing: -0.025em;
             }}
-            p {{
+            .tagline {{
+                color: var(--primary-color);
+                font-size: 0.95rem;
+                font-weight: 600;
+                font-family: monospace;
+                margin: 0 0 20px 0;
+            }}
+            .sub-desc {{
                 color: var(--text-secondary);
-                font-size: 0.9rem;
-                margin: 0 0 30px 0;
+                font-size: 0.85rem;
+                margin: 0 0 25px 0;
+                opacity: 0.8;
             }}
             .form-group {{
                 margin-bottom: 20px;
@@ -611,9 +620,10 @@ def get_login_page_html(error: str = None):
     </head>
     <body>
         <div class="login-container">
-            <div class="logo-wrap"><i class="fas fa-shield-halved"></i></div>
-            <h2>AI Command Center</h2>
-            <p>Masukkan kata sandi untuk mengakses Status Server</p>
+            <div class="logo-wrap"><i class="fas fa-microchip"></i></div>
+            <h2>NO MORE HUMAN</h2>
+            <p class="tagline">Humans are optional.</p>
+            <p class="sub-desc">Masukkan kata sandi untuk mengakses Status Server</p>
             {error_html}
             <form action="/admin-login" method="post">
                 <div class="form-group">
