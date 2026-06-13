@@ -45,6 +45,8 @@ for d in [UPLOAD_DIR, OUTPUT_DIR]:
 if not IS_SERVERLESS:
     os.makedirs("public", exist_ok=True)
 
+MAX_FILE_SIZE = 10 * 1024 * 1024 # 10 MB
+
 def validate_excel_mime(file: UploadFile):
     allowed_extensions = ['.xlsx', '.xls']
     _, ext = os.path.splitext(file.filename)
@@ -53,6 +55,20 @@ def validate_excel_mime(file: UploadFile):
             status_code=400, 
             detail=f"Format file tidak valid. Aplikasi hanya menerima file Excel (.xlsx, .xls), bukan {file.filename}."
         )
+    
+    try:
+        file.file.seek(0, os.SEEK_END)
+        size = file.file.tell()
+        file.file.seek(0)
+        if size > MAX_FILE_SIZE:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Ukuran berkas melebihi batas 10 MB (Ukuran berkas Anda: {size / (1024*1024):.1f} MB)."
+            )
+    except Exception as e:
+        if isinstance(e, HTTPException):
+            raise e
+        pass
 
 # Helper function for temporary file handling
 def save_temp_file(file: UploadFile) -> str:

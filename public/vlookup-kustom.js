@@ -85,6 +85,10 @@ function initVlookupKustom() {
             templateKeySelect.value = commonKey;
         }
 
+        window.convertSelectToPopup('vlookup-main-key', 'Pilih Kunci Utama');
+        window.convertSelectToPopup('vlookup-template-key', 'Pilih Kunci Template');
+        window.convertSelectToPopup('vlookup-value-to-get', 'Pilih Data yang Ingin Diambil');
+
         document.getElementById('vlookupHeadersPreview').innerHTML = `<h4><i class="fas fa-list-ul"></i> Pratinjau Kolom</h4><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;"><div><p style="font-weight: 600; margin-bottom: 5px;">File Utama</p><ul style="font-size: 0.8em; margin: 0; padding-left: 15px; max-height: 150px; overflow-y: auto;">${mainHeaders.map(h => `<li>${h}</li>`).join('')}</ul></div><div><p style="font-weight: 600; margin-bottom: 5px;">File Template</p><ul style="font-size: 0.8em; margin: 0; padding-left: 15px; max-height: 150px; overflow-y: auto;">${templateHeaders.map(h => `<li>${h}</li>`).join('')}</ul></div></div>`;
         vlookupControlPanelDiv.style.display = 'block';
     }

@@ -45,6 +45,7 @@ function initTarifGenerator() {
             const sheetNames = Object.keys(tarifInspectionData);
             tarifSheetSelect.innerHTML = sheetNames.map(name => `<option value="${name}">${name}</option>`).join('');
             updateTarifControlPanel(sheetNames[0]);
+            window.convertSelectToPopup('tarifSheetSelect', 'Pilih Sheet');
             tarifControlPanelDiv.style.display = 'block';
         } catch (err) {
             clearTimeout(timeoutId);
@@ -68,6 +69,7 @@ function initTarifGenerator() {
 
         tarifFilterColumnSelect.innerHTML = '<option value="">-- Tidak Ada Filter --</option>' + headers.map(h => `<option value="${h}">${h}</option>`).join('');
         updateFilterValueCheckboxes(sheetName, '');
+        window.convertSelectToPopup('tarifFilterColumnSelect', 'Pilih Kolom Filter');
 
         const targets = {
             kode: { label: 'Kolom Kode Item', k: ['KODE', 'CODE'] },
@@ -85,6 +87,7 @@ function initTarifGenerator() {
             const select = document.getElementById(`tarif-${key}-select`);
             const bestGuess = headers.find(h => value.k.some(kw => h.toUpperCase().includes(kw)));
             if (bestGuess) select.value = bestGuess;
+            window.convertSelectToPopup(`tarif-${key}-select`, value.label);
         });
 
         document.getElementById('tarif-kelas-select').addEventListener('change', () => updateClassMappingPanel(sheetName));

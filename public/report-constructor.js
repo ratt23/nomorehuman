@@ -106,6 +106,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
         renderMappingUI();
 
+        window.convertSelectToPopup('rcSheetSelect', 'Pilih Sheet');
+        window.convertSelectToPopup('rcUniqueKeyColumn', 'Pilih Kunci Unik');
+
         document.getElementById('rcSheetSelect').addEventListener('change', updateConstructorPanel);
         document.getElementById('rcHeaderRowCount').addEventListener('change', reInspectWithNewSettings);
         document.getElementById('rcAddColumnBtn').addEventListener('click', addMappingRow);
@@ -158,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const newHeaders = inspectionData.headersBySheet[selectedSheet] || [];
         const uniqueKeySelect = document.getElementById('rcUniqueKeyColumn');
         uniqueKeySelect.innerHTML = `<option value="">-- Tidak Ada --</option>${newHeaders.map(h => `<option value="${h}">${h}</option>`).join('')}`;
+        window.convertSelectToPopup('rcUniqueKeyColumn', 'Pilih Kunci Unik');
         currentMappings = newHeaders.slice(0, 5).map(h => ({
             id: Date.now() + Math.random(),
             outputHeader: h,
