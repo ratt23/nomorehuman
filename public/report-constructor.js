@@ -38,7 +38,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(window.API_BASE_URL + '/inspect-source-file', { method: 'POST', body: formData });
             const result = await response.json();
-            if (!result.ok) throw new Error(result.error);
+            if (!response.ok || !result.ok) {
+                const errMsg = result.error || (result.detail ? (typeof result.detail === 'string' ? result.detail : JSON.stringify(result.detail)) : 'Terjadi kesalahan pada server');
+                throw new Error(errMsg);
+            }
             
             inspectionData = result;
             buildConstructorPanel();
@@ -137,7 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch(window.API_BASE_URL + '/inspect-source-file', { method: 'POST', body: formData });
             const result = await response.json();
-            if (!result.ok) throw new Error(result.error);
+            if (!response.ok || !result.ok) {
+                const errMsg = result.error || (result.detail ? (typeof result.detail === 'string' ? result.detail : JSON.stringify(result.detail)) : 'Terjadi kesalahan pada server');
+                throw new Error(errMsg);
+            }
             inspectionData = result;
             updateConstructorPanel();
         } catch (err) {

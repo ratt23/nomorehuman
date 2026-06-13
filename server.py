@@ -320,12 +320,12 @@ async def double_check_tarif(
 @app.post("/inspect-source-file")
 async def inspect_source_file_endpoint(
     file: UploadFile = File(...),
-    config: str = Form(...)
+    config: str = Form(None)
 ):
     validate_excel_mime(file)
     temp_path = save_temp_file(file)
     try:
-        config_data = json.loads(config)
+        config_data = json.loads(config) if config else None
         res = report_constructor_engine.inspect_source_file(temp_path, config_data)
         return {'ok': True, **res}
     except Exception as e:
