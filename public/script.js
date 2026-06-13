@@ -1,6 +1,6 @@
 // --- DYNAMIC API BASE URL RESOLVER ---
 const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-window.API_BASE_URL = isLocalHost ? '' : 'https://no-more-human-api.onrender.com';
+window.API_BASE_URL = isLocalHost ? '' : 'https://nomorehuman.onrender.com';
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- Variabel Global yang Dapat Diakses Semua Script ---
