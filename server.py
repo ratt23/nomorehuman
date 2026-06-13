@@ -2,10 +2,13 @@ import os
 import shutil
 import json
 import re
+import time
+import platform
+import psutil
 from datetime import datetime
-from fastapi import FastAPI, File, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from openpyxl import load_workbook
 
 # Import modules
@@ -15,6 +18,9 @@ import report_constructor_engine
 import vlookup_processor
 import validate_excel
 from fastapi.middleware.cors import CORSMiddleware
+
+# Track server start time for uptime calculation
+SERVER_START_TIME = time.time()
 
 app = FastAPI(title="no more human!! Backend")
 
@@ -487,7 +493,417 @@ async def vlookup_process_endpoint(
         delete_file(main_path)
         delete_file(temp_path)
 
-# Static Files mount at the very end (only when running locally, not in serverless)
-if not IS_SERVERLESS:
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "nomorehuman2026")
+
+def get_login_page_html(error: str = None):
+    error_html = f'<div class="error-msg">{error}</div>' if error else ''
+    return f"""
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Admin Login - no more human!!</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <style>
+            :root {{
+                --bg-color: #080B12;
+                --panel-bg: #101827;
+                --primary-color: #0066FF;
+                --text-color: #F3F4F6;
+                --text-secondary: #9CA3AF;
+                --border-color: rgba(255, 255, 255, 0.08);
+                --danger-color: #EF4444;
+            }}
+            body {{
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                margin: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                height: 100vh;
+                overflow: hidden;
+            }}
+            .login-container {{
+                background: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 40px;
+                width: 100%;
+                max-width: 400px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(0, 102, 255, 0.05);
+                text-align: center;
+                box-sizing: border-box;
+            }}
+            .logo-wrap {{
+                font-size: 2.5rem;
+                color: var(--primary-color);
+                margin-bottom: 20px;
+            }}
+            h2 {{
+                margin: 0 0 10px 0;
+                font-size: 1.5rem;
+                font-weight: 700;
+            }}
+            p {{
+                color: var(--text-secondary);
+                font-size: 0.9rem;
+                margin: 0 0 30px 0;
+            }}
+            .form-group {{
+                margin-bottom: 20px;
+                text-align: left;
+            }}
+            label {{
+                display: block;
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 8px;
+                color: var(--text-secondary);
+            }}
+            input[type="password"] {{
+                width: 100%;
+                padding: 12px;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--border-color);
+                border-radius: 6px;
+                color: var(--text-color);
+                font-size: 1rem;
+                box-sizing: border-box;
+                transition: border-color 0.2s, background-color 0.2s;
+            }}
+            input[type="password"]:focus {{
+                border-color: var(--primary-color);
+                outline: none;
+                background: rgba(0, 102, 255, 0.05);
+            }}
+            .btn {{
+                width: 100%;
+                padding: 12px;
+                background: var(--primary-color);
+                border: none;
+                border-radius: 6px;
+                color: white;
+                font-size: 1rem;
+                font-weight: 600;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }}
+            .btn:hover {{
+                background-color: #0052cc;
+            }}
+            .error-msg {{
+                color: var(--danger-color);
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 20px;
+                padding: 10px;
+                background: rgba(239, 68, 68, 0.1);
+                border: 1px solid rgba(239, 68, 68, 0.2);
+                border-radius: 6px;
+            }}
+        </style>
+    </head>
+    <body>
+        <div class="login-container">
+            <div class="logo-wrap"><i class="fas fa-shield-halved"></i></div>
+            <h2>AI Command Center</h2>
+            <p>Masukkan kata sandi untuk mengakses Status Server</p>
+            {error_html}
+            <form action="/admin-login" method="post">
+                <div class="form-group">
+                    <label for="password">Kata Sandi Admin</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required autofocus>
+                </div>
+                <button type="submit" class="btn">Masuk <i class="fas fa-arrow-right-to-bracket"></i></button>
+            </form>
+        </div>
+    </body>
+    </html>
+    """
+
+def get_admin_dashboard_html():
+    uptime_seconds = int(time.time() - SERVER_START_TIME)
+    days = uptime_seconds // 86400
+    hours = (uptime_seconds % 86400) // 3600
+    minutes = (uptime_seconds % 3600) // 60
+    seconds = uptime_seconds % 60
+    uptime_str = f"{days}d {hours}h {minutes}m {seconds}s"
+    
+    cpu_usage = psutil.cpu_percent()
+    memory = psutil.virtual_memory()
+    mem_used_mb = int(memory.used / (1024 * 1024))
+    mem_total_mb = int(memory.total / (1024 * 1024))
+    mem_percent = memory.percent
+    
+    # Process memory
+    process_mem_mb = int(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024))
+    
+    return f"""
+    <!doctype html>
+    <html lang="en">
+    <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Status Server - no more human!!</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+        <style>
+            :root {{
+                --bg-color: #080B12;
+                --panel-bg: #101827;
+                --primary-color: #0066FF;
+                --success-color: #00D084;
+                --text-color: #F3F4F6;
+                --text-secondary: #9CA3AF;
+                --border-color: rgba(255, 255, 255, 0.08);
+            }}
+            body {{
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                margin: 0;
+                padding: 40px 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-height: 100vh;
+                box-sizing: border-box;
+            }}
+            .dashboard-container {{
+                width: 100%;
+                max-width: 800px;
+            }}
+            header {{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 30px;
+                border-bottom: 1px solid var(--border-color);
+                padding-bottom: 20px;
+            }}
+            h2 {{
+                margin: 0;
+                font-size: 1.5rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }}
+            .btn-logout {{
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid var(--border-color);
+                padding: 8px 16px;
+                border-radius: 6px;
+                color: var(--text-color);
+                text-decoration: none;
+                font-size: 0.85rem;
+                font-weight: 600;
+                transition: background-color 0.2s;
+            }}
+            .btn-logout:hover {{
+                background: rgba(239, 68, 68, 0.1);
+                color: #EF4444;
+                border-color: rgba(239, 68, 68, 0.2);
+            }}
+            .status-badge {{
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                background: rgba(0, 208, 132, 0.1);
+                border: 1px solid rgba(0, 208, 132, 0.2);
+                color: var(--success-color);
+                padding: 6px 12px;
+                border-radius: 50px;
+                font-size: 0.8rem;
+                font-weight: 600;
+            }}
+            .badge-dot {{
+                width: 8px;
+                height: 8px;
+                background: var(--success-color);
+                border-radius: 50%;
+                box-shadow: 0 0 10px var(--success-color);
+            }}
+            .metrics-grid {{
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+                margin-bottom: 30px;
+            }}
+            .metric-card {{
+                background: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 25px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            }}
+            .metric-title {{
+                color: var(--text-secondary);
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-bottom: 15px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }}
+            .metric-value {{
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--text-color);
+                margin-bottom: 10px;
+            }}
+            .progress-bar-container {{
+                background: rgba(255, 255, 255, 0.05);
+                height: 8px;
+                border-radius: 10px;
+                overflow: hidden;
+            }}
+            .progress-bar {{
+                background: var(--primary-color);
+                height: 100%;
+                border-radius: 10px;
+                transition: width 0.5s ease-out;
+            }}
+            .progress-bar.success {{
+                background: var(--success-color);
+            }}
+            .system-details-card {{
+                background: var(--panel-bg);
+                border: 1px solid var(--border-color);
+                border-radius: 12px;
+                padding: 25px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            }}
+            .detail-row {{
+                display: flex;
+                justify-content: space-between;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border-color);
+                font-size: 0.9rem;
+            }}
+            .detail-row:last-child {{
+                border-bottom: none;
+                padding-bottom: 0;
+            }}
+            .detail-row:first-child {{
+                padding-top: 0;
+            }}
+            .detail-label {{
+                color: var(--text-secondary);
+                font-weight: 500;
+            }}
+            .detail-value {{
+                font-weight: 600;
+                font-family: monospace;
+            }}
+        </style>
+        <script>
+            setTimeout(() => {{
+                window.location.reload();
+            }}, 10000);
+        </script>
+    </head>
+    <body>
+        <div class="dashboard-container">
+            <header>
+                <h2><i class="fas fa-server" style="color: var(--primary-color);"></i> Panel Admin Server</h2>
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <div class="status-badge">
+                        <span class="badge-dot"></span> <span>Online</span>
+                    </div>
+                    <a href="/admin-logout" class="btn-logout"><i class="fas fa-sign-out-alt"></i> Keluar</a>
+                </div>
+            </header>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-microchip"></i> Penggunaan CPU</div>
+                    <div class="metric-value">{cpu_usage}%</div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: {cpu_usage}%"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-memory"></i> Penggunaan RAM System</div>
+                    <div class="metric-value">{mem_percent}%</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px;">
+                        Terpakai: {mem_used_mb} MB / Total: {mem_total_mb} MB
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar success" style="width: {mem_percent}%"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="system-details-card">
+                <div class="metric-title" style="margin-bottom: 20px;"><i class="fas fa-circle-info"></i> Rincian Server</div>
+                <div class="detail-row">
+                    <span class="detail-label">Uptime Server</span>
+                    <span class="detail-value" style="color: var(--success-color);">{uptime_str}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">RAM Proses (FastAPI)</span>
+                    <span class="detail-value">{process_mem_mb} MB</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Sistem Operasi</span>
+                    <span class="detail-value">{platform.system()} ({platform.machine()})</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Versi Python</span>
+                    <span class="detail-value">{platform.python_version()}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Folder Sementara (/tmp)</span>
+                    <span class="detail-value">{UPLOAD_DIR}</span>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+@app.get("/", response_class=HTMLResponse)
+async def get_root(request: Request):
+    if not os.environ.get("RENDER"):
+        with open("public/index.html", "r", encoding="utf-8") as f:
+            return f.read()
+            
+    token = request.cookies.get("admin_token")
+    if token == ADMIN_PASSWORD:
+        return get_admin_dashboard_html()
+    else:
+        return get_login_page_html()
+
+@app.post("/admin-login")
+async def admin_login(password: str = Form(...)):
+    if password == ADMIN_PASSWORD:
+        response = RedirectResponse(url="/", status_code=303)
+        response.set_cookie(
+            key="admin_token", 
+            value=ADMIN_PASSWORD, 
+            max_age=86400 * 7, 
+            httponly=True,
+            samesite="lax"
+        )
+        return response
+    else:
+        return get_login_page_html(error="Password salah!")
+
+@app.get("/admin-logout")
+async def admin_logout():
+    response = RedirectResponse(url="/", status_code=303)
+    response.delete_cookie(key="admin_token")
+    return response
+
+# Static Files mount at the very end (only when running locally, not on Render)
+if not os.environ.get("RENDER"):
     app.mount("/output", StaticFiles(directory="output"), name="output")
     app.mount("/", StaticFiles(directory="public", html=True), name="public")
