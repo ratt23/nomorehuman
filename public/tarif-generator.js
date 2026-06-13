@@ -27,7 +27,7 @@ function initTarifGenerator() {
         tarifResDiv.innerHTML = '';
         tarifControlPanelDiv.style.display = 'none';
         tarifLoadingDiv.style.display = 'block';
-        tarifLoadingDiv.innerHTML = '<div class="spinner"></div><p>Menginspeksi file...</p>';
+        tarifLoadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Menginspeksi file...</p></div>';
         const formData = new FormData();
         formData.append('file', tarifUploadedFile);
 
@@ -140,7 +140,7 @@ function initTarifGenerator() {
     tarifProcessBtn.addEventListener('click', async () => {
         toggleButtonLoading(tarifProcessBtn, true);
         tarifLoadingDiv.style.display = 'block';
-        tarifLoadingDiv.innerHTML = '<div class="spinner"></div><p>Memproses data, mohon tunggu...</p>';
+        tarifLoadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Memproses data, mohon tunggu...</p></div>';
         tarifControlPanelDiv.style.display = 'none';
 
         const mappings = { kode: document.getElementById('tarif-kode-select').value, nama: document.getElementById('tarif-nama-select').value, kelas: document.getElementById('tarif-kelas-select').value, harga: document.getElementById('tarif-harga-select').value };

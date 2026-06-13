@@ -45,7 +45,7 @@ function initVlookupKustom() {
 
     vlookupInspectBtn.addEventListener('click', async () => {
         vlookupLoadingDiv.style.display = 'block';
-        vlookupLoadingDiv.innerHTML = '<div class="spinner"></div><p>Memeriksa file...</p>';
+        vlookupLoadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Memeriksa file...</p></div>';
         vlookupControlPanelDiv.style.display = 'none';
         vlookupResDiv.innerHTML = '';
         const formData = new FormData();
@@ -96,7 +96,7 @@ function initVlookupKustom() {
     vlookupProcessBtn.addEventListener('click', async () => {
         toggleButtonLoading(vlookupProcessBtn, true);
         vlookupLoadingDiv.style.display = 'block';
-        vlookupLoadingDiv.innerHTML = '<div class="spinner"></div><p>Menggabungkan file...</p>';
+        vlookupLoadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Menggabungkan file...</p></div>';
         vlookupControlPanelDiv.style.display = 'none';
 
         const mappings = { mainKey: document.getElementById('vlookup-main-key').value, templateKey: document.getElementById('vlookup-template-key').value, valueToGet: document.getElementById('vlookup-value-to-get').value };

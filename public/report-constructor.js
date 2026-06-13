@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!sourceFile) return;
 
         loadingDiv.style.display = 'block';
-        loadingDiv.innerHTML = '<div class="spinner"></div><p>Menginspeksi file sumber...</p>';
+        loadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Menginspeksi file sumber...</p></div>';
 
         const formData = new FormData();
         formData.append('file', sourceFile);
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function reInspectWithNewSettings() {
         if (!sourceFile) return;
         loadingDiv.style.display = 'block';
-        loadingDiv.innerHTML = '<div class="spinner"></div><p>Memuat ulang header...</p>';
+        loadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Memuat ulang header...</p></div>';
         const formData = new FormData();
         formData.append('file', sourceFile);
         const config = {
@@ -189,12 +189,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ${currentMappings.map(mapping => `
                 <div class="mapping-row-item" data-id="${mapping.id}">
                     <input type="text" class="mapping-output-header" value="${mapping.outputHeader}" placeholder="Nama Kolom Output">
-                    <div class="searchable-dropdown" data-value="${mapping.sourceHeader}">
-                        <input type="text" class="search-input" placeholder="Ketik untuk mencari..." value="${mapping.sourceHeader}">
-                        <div class="dropdown-options">
-                            ${sourceHeaders.map(h => `<div class="option" data-value="${h}">${h}</div>`).join('')}
-                        </div>
-                    </div>
+                    <button type="button" class="btn-select-popup mapping-source-select-btn" data-id="${mapping.id}">
+                        <span>${mapping.sourceHeader || 'Pilih Kolom Sumber...'}</span>
+                        <i class="fas fa-chevron-down" style="font-size: 0.8em; opacity: 0.7;"></i>
+                    </button>
                     <button class="btn-delete-mapping"><i class="fas fa-trash-alt"></i></button>
                 </div>
             `).join('')}
@@ -205,7 +203,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.files.length === 0) return;
         const templateFile = e.target.files[0];
         loadingDiv.style.display = 'block';
-        loadingDiv.innerHTML = '<div class="spinner"></div><p>Membaca struktur template...</p>';
+        loadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Membaca struktur template...</p></div>';
         const formData = new FormData();
         formData.append('templateFile', templateFile);
         try {
@@ -253,31 +251,20 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        const option = e.target.closest('.option');
-        if (option) {
-            const dropdown = option.closest('.searchable-dropdown');
-            const searchInput = dropdown.querySelector('.search-input');
-            const value = option.dataset.value;
-            
-            searchInput.value = value;
-            dropdown.dataset.value = value;
-            dropdown.classList.remove('open');
-            
-            const rowElement = dropdown.closest('.mapping-row-item');
-            const id = parseFloat(rowElement.dataset.id);
+        const selectBtn = e.target.closest('.mapping-source-select-btn');
+        if (selectBtn) {
+            const id = parseFloat(selectBtn.dataset.id);
             const mapping = currentMappings.find(m => m.id === id);
             if (mapping) {
-                mapping.sourceHeader = value;
+                const selectedSheet = document.getElementById('rcSheetSelect')?.value || inspectionData.sheets[0];
+                const sourceHeaders = inspectionData.headersBySheet[selectedSheet] || [];
+                const options = sourceHeaders.map(h => ({ value: h, text: h }));
+                window.showColumnSelectModal('Pilih Kolom Sumber', options, mapping.sourceHeader, (selectedValue) => {
+                    mapping.sourceHeader = selectedValue;
+                    selectBtn.querySelector('span').textContent = selectedValue || 'Pilih Kolom Sumber...';
+                });
             }
             return;
-        }
-
-        const searchInput = e.target.closest('.search-input');
-        if (searchInput) {
-            document.querySelectorAll('.searchable-dropdown').forEach(d => d.classList.remove('open'));
-            searchInput.closest('.searchable-dropdown').classList.add('open');
-        } else {
-            document.querySelectorAll('.searchable-dropdown').forEach(d => d.classList.remove('open'));
         }
     }
 
@@ -292,27 +279,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if (e.target.classList.contains('mapping-output-header')) {
             mapping.outputHeader = e.target.value;
         }
-        
-        if (e.target.classList.contains('search-input')) {
-            const dropdown = e.target.closest('.searchable-dropdown');
-            const filter = e.target.value.toLowerCase();
-            const options = dropdown.querySelectorAll('.option');
-            options.forEach(option => {
-                const text = option.textContent.toLowerCase();
-                if (text.includes(filter)) {
-                    option.style.display = '';
-                } else {
-                    option.style.display = 'none';
-                }
-            });
-        }
     }
 
     async function processReport() {
         const processBtn = document.getElementById('rcProcessBtn');
         toggleButtonLoading(processBtn, true);
         loadingDiv.style.display = 'block';
-        loadingDiv.innerHTML = '<div class="spinner"></div><p>Membangun laporan kustom...</p>';
+        loadingDiv.innerHTML = '<div class="loading-modal-card"><div class="spinner"></div><p>Membangun laporan kustom...</p></div>';
         controlPanelDiv.style.display = 'none';
 
         const selectedSheet = document.getElementById('rcSheetSelect').value;
