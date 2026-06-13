@@ -163,14 +163,18 @@ function initTarifGenerator() {
             // Menggunakan variabel global
             window.lastProcessedFiles = { original: tarifUploadedFile, processed: { excelUrl: result.excel, pdfUrl: result.pdf, mappings, classMap, selectedSheet } };
 
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const excelHref = isLocal ? (window.API_BASE_URL + result.excel) : `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${result.excelData}`;
+            const pdfHref = isLocal ? (window.API_BASE_URL + result.pdf) : `data:application/pdf;base64,${result.pdfData}`;
+
             const resultHTML = `
               <div class="report-dashboard">
                 <div class="report-icon success"><i class="fas fa-check-circle"></i></div>
                 <h3>Proses Berhasil!</h3>
                 <p>Buku tarif Anda telah dibuat berdasarkan ${result.diagnostics?.summary?.uniqueItemCount || 'N/A'} item unik.</p>
                 <div class="download-actions">
-                  <a href="${window.API_BASE_URL + result.excel}" target="_blank" class="btn btn-primary"><i class="fas fa-file-excel"></i> Unduh Excel</a>
-                  <a href="${window.API_BASE_URL + result.pdf}" target="_blank" class="btn" style="background-color: var(--danger-color);"><i class="fas fa-file-pdf"></i> Unduh PDF</a>
+                  <a href="${excelHref}" download="${result.excelFilename}" target="_blank" class="btn btn-primary"><i class="fas fa-file-excel"></i> Unduh Excel</a>
+                  <a href="${pdfHref}" download="${result.pdfFilename}" target="_blank" class="btn" style="background-color: var(--danger-color);"><i class="fas fa-file-pdf"></i> Unduh PDF</a>
                 </div>
                 <div class="secondary-actions">
                   <button id="reviewBtn" class="btn-link"><i class="fas fa-search"></i> Tinjau Ringkasan Proses</button>

@@ -3,3 +3,9 @@
 
 [build.environment]
   PYTHON_VERSION = "3.11.9"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+

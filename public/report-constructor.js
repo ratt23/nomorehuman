@@ -332,13 +332,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (!result.ok) throw new Error(result.error);
             
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const excelHref = isLocal ? (window.API_BASE_URL + result.excel) : `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${result.excelData}`;
+
             resDiv.innerHTML = `
                 <div class="report-dashboard">
                     <div class="report-icon success"><i class="fas fa-check-circle"></i></div>
                     <h3>Laporan Berhasil Dibuat!</h3>
                     <p>File Anda telah berhasil dibuat dengan ${result.diagnostics.rowsAdded} baris data.</p>
                     <div class="download-actions">
-                      <a href="${window.API_BASE_URL + result.excel}" target="_blank" class="btn btn-primary"><i class="fas fa-file-excel"></i> Unduh Laporan Excel</a>
+                      <a href="${excelHref}" download="${result.excelFilename}" target="_blank" class="btn btn-primary"><i class="fas fa-file-excel"></i> Unduh Laporan Excel</a>
                     </div>
                     <hr>
                     <button id="rcProcessNewBtn" class="btn btn-secondary"><i class="fas fa-redo"></i> Buat Laporan Baru</button>

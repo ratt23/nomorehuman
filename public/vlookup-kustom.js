@@ -106,13 +106,16 @@ function initVlookupKustom() {
             const result = await response.json();
             if (!result.ok) throw new Error(result.error);
 
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const excelHref = isLocal ? (window.API_BASE_URL + result.excel) : `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${result.excelData}`;
+
             const { summary } = result.diagnostics;
             const resultHTML = `
               <div class="report-dashboard">
                 <div class="report-icon success"><i class="fas fa-check-circle"></i></div>
                 <h3>Penggabungan Berhasil!</h3>
                 <p>Berhasil mencocokkan <strong>${summary.totalRowsMatched}</strong> dari <strong>${summary.totalRowsInMainFile}</strong> baris (${summary.matchPercentage.toFixed(1)}%).</p>
-                <div class="download-actions"><a href="${window.API_BASE_URL + result.excel}" target="_blank" class="btn btn-primary"><i class="fas fa-file-excel"></i> Unduh Hasil Excel</a></div>
+                <div class="download-actions"><a href="${excelHref}" download="${result.excelFilename}" target="_blank" class="btn btn-primary"><i class="fas fa-file-excel"></i> Unduh Hasil Excel</a></div>
                 <div class="secondary-actions"><button id="reviewVlookupBtn" class="btn-link"><i class="fas fa-search"></i> Tinjau Ringkasan Penggabungan</button></div>
                 <hr>
                 <button id="processNewVlookupBtn" class="btn btn-secondary"><i class="fas fa-redo"></i> Proses File Baru</button>

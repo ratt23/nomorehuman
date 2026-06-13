@@ -27,11 +27,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-UPLOAD_DIR = "uploads"
-OUTPUT_DIR = "output"
+import base64
+import tempfile
 
-for d in [UPLOAD_DIR, OUTPUT_DIR, "public"]:
+IS_SERVERLESS = "NETLIFY" in os.environ or "LAMBDA_TASK_ROOT" in os.environ
+
+if IS_SERVERLESS:
+    UPLOAD_DIR = os.path.join(tempfile.gettempdir(), "uploads")
+    OUTPUT_DIR = os.path.join(tempfile.gettempdir(), "output")
+else:
+    UPLOAD_DIR = "uploads"
+    OUTPUT_DIR = "output"
+
+for d in [UPLOAD_DIR, OUTPUT_DIR]:
     os.makedirs(d, exist_ok=True)
+
+if not IS_SERVERLESS:
+    os.makedirs("public", exist_ok=True)
 
 def validate_excel_mime(file: UploadFile):
     allowed_extensions = ['.xlsx', '.xls']
@@ -144,11 +156,25 @@ async def process_file(
         
         generate_pdf_from_data(all_accepted_rows, pdf_path)
         
+        # Read and encode output files to Base64
+        with open(final_xlsx_path, "rb") as f:
+            excel_base64 = base64.b64encode(f.read()).decode('utf-8')
+        with open(pdf_path, "rb") as f:
+            pdf_base64 = base64.b64encode(f.read()).decode('utf-8')
+            
+        if IS_SERVERLESS:
+            delete_file(final_xlsx_path)
+            delete_file(pdf_path)
+            
         return {
             'ok': True,
             'message': 'File berhasil diproses!',
             'excel': f"/output/{os.path.basename(final_xlsx_path)}",
             'pdf': f"/output/{os.path.basename(pdf_path)}",
+            'excelData': excel_base64,
+            'pdfData': pdf_base64,
+            'excelFilename': os.path.basename(final_xlsx_path),
+            'pdfFilename': os.path.basename(pdf_path),
             'diagnostics': {
                 'summary': res['summary'],
                 'rejectedRowsSample': res['rejectedRowsSample'],
@@ -355,10 +381,20 @@ async def build_report_endpoint(
     try:
         config_data = json.loads(config)
         result_path, diagnostics = report_constructor_engine.build_report(temp_path, config_data)
+        
+        # Read and encode to Base64
+        with open(result_path, "rb") as f:
+            excel_base64 = base64.b64encode(f.read()).decode('utf-8')
+            
+        if IS_SERVERLESS:
+            delete_file(result_path)
+            
         return {
             'ok': True,
             'message': 'Laporan berhasil dibuat!',
             'excel': f"/output/{os.path.basename(result_path)}",
+            'excelData': excel_base64,
+            'excelFilename': os.path.basename(result_path),
             'diagnostics': diagnostics
         }
     except Exception as e:
@@ -414,9 +450,19 @@ async def vlookup_process_endpoint(
         result_path, diagnostics = vlookup_processor.perform_vlookup(
             main_path, temp_path, mappings_data
         )
+        
+        # Read and encode to Base64
+        with open(result_path, "rb") as f:
+            excel_base64 = base64.b64encode(f.read()).decode('utf-8')
+            
+        if IS_SERVERLESS:
+            delete_file(result_path)
+            
         return {
             'ok': True,
             'excel': f"/output/{os.path.basename(result_path)}",
+            'excelData': excel_base64,
+            'excelFilename': os.path.basename(result_path),
             'diagnostics': diagnostics
         }
     except Exception as e:
@@ -425,6 +471,7 @@ async def vlookup_process_endpoint(
         delete_file(main_path)
         delete_file(temp_path)
 
-# Static Files mount at the very end
-app.mount("/output", StaticFiles(directory="output"), name="output")
-app.mount("/", StaticFiles(directory="public", html=True), name="public")
+# Static Files mount at the very end (only when running locally, not in serverless)
+if not IS_SERVERLESS:
+    app.mount("/output", StaticFiles(directory="output"), name="output")
+    app.mount("/", StaticFiles(directory="public", html=True), name="public")
