@@ -1,0 +1,23 @@
+{
+  "name": "graphiworks",
+  "version": "1.0.0",
+  "description": "Aplikasi pengolah data cerdas",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build-win": "electron-packager . GraphiWorks --platform=win32 --arch=x64 --out=dist/ --overwrite",
+    "build-mac": "electron-packager . GraphiWorks --platform=darwin --arch=x64 --out=dist/ --overwrite",
+    "build-linux": "electron-packager . GraphiWorks --platform=linux --arch=x64 --out=dist/ --overwrite"
+  },
+  "dependencies": {
+    "exceljs": "^4.4.0",
+    "express": "^4.18.2",
+    "multer": "^1.4.5-lts.1",
+    "puppeteer-core": "^21.11.0",
+    "sanitize-filename": "^1.6.3"
+  },
+  "devDependencies": {
+    "electron": "^39.1.2",
+    "electron-packager": "^17.1.2"
+  }
+}

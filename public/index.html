@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>no more human!! - AI Command Center</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TERMINAL BOOT ANIMATION OVERLAY -->
+<div id="bootOverlay" class="boot-overlay">
+    <div class="boot-terminal" id="bootTerminal">
+        <!-- Lines will be injected dynamically by JavaScript -->
+    </div>
+</div>
+
+<div class="container">
+    <header class="app-header">
+        <h2><i class="fas fa-microchip" style="color: var(--primary-color);"></i> no more human!!</h2>
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <button class="btn-lang" id="langBtn"><i class="fas fa-globe"></i> <span>EN</span></button>
+            <button class="btn btn-secondary" id="backToMenuBtn" style="display: none;">
+                <i class="fas fa-arrow-left"></i> <span data-translate-id="Menu Utama" data-translate-en="Main Menu">Menu Utama</span>
+            </button>
+        </div>
+    </header>
+    
+    <main>
+        <!-- MAIN DASHBOARD MENU -->
+        <div id="mainMenu" class="view">
+            <!-- HERO SECTION -->
+            <div class="hero-section">
+                <div class="status-badge">
+                    <span class="badge-dot"></span> <span data-translate-id="Inti Otomatisasi Aktif" data-translate-en="Automation Core Online">Inti Otomatisasi Aktif</span>
+                </div>
+                <h1 class="hero-title">NO MORE HUMAN</h1>
+                <p class="hero-tagline">Humans are optional.</p>
+                <p class="hero-desc">
+                    <span data-translate-id="Ubah alur kerja berulang menjadi kecerdasan otomatis." data-translate-en="Transform repetitive workflows into automated intelligence.">Ubah alur kerja berulang menjadi kecerdasan otomatis.</span>
+                    <span style="opacity: 0.5; display: block; margin-top: 6px; font-size: 0.85rem; font-family: monospace;">by rattputt</span>
+                </p>
+            </div>
+            
+            <!-- METRICS SUMMARY -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-value">1,420</span>
+                    <span class="metric-label" data-translate-id="Jam Kerja Manusia Dihemat" data-translate-en="Human Hours Saved">Jam Kerja Manusia Dihemat</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value">12,854</span>
+                    <span class="metric-label" data-translate-id="Berkas Diproses" data-translate-en="Files Processed">Berkas Diproses</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value">85,214</span>
+                    <span class="metric-label" data-translate-id="Tugas Dihilangkan" data-translate-en="Tasks Eliminated">Tugas Dihilangkan</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-value">99.98%</span>
+                    <span class="metric-label" data-translate-id="Tingkat Keberhasilan" data-translate-en="Success Rate">Tingkat Keberhasilan</span>
+                </div>
+            </div>
+            
+            <!-- MODULES GRID -->
+            <div class="modules-grid">
+                <!-- Tariff Engine -->
+                <div class="module-card menu-choice" data-target="tarifGeneratorApp">
+                    <div class="module-icon-wrap"><i class="fas fa-file-invoice-dollar"></i></div>
+                    <h3 class="module-title">Tariff Engine</h3>
+                    <p class="module-desc" data-translate-id="Buat dan format buku tarif rumah sakit secara otomatis." data-translate-en="Generate and format hospital tariff books automatically.">Buat dan format buku tarif rumah sakit secara otomatis.</p>
+                    <button class="btn btn-launch">
+                        <span data-translate-id="Jalankan Mesin" data-translate-en="Launch Engine">Jalankan Mesin</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Report Forge -->
+                <div class="module-card menu-choice" data-target="reportConstructorApp">
+                    <div class="module-icon-wrap"><i class="fas fa-chart-bar"></i></div>
+                    <h3 class="module-title">Report Forge</h3>
+                    <p class="module-desc" data-translate-id="Bangun laporan manajemen dari data operasional mentah." data-translate-en="Build management reports from raw operational data.">Bangun laporan manajemen dari data operasional mentah.</p>
+                    <button class="btn btn-launch">
+                        <span data-translate-id="Jalankan Mesin" data-translate-en="Launch Engine">Jalankan Mesin</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+                
+                <!-- Data Assimilator -->
+                <div class="module-card menu-choice" data-target="vlookupApp">
+                    <div class="module-icon-wrap"><i class="fas fa-database"></i></div>
+                    <h3 class="module-title">Data Assimilator</h3>
+                    <p class="module-desc" data-translate-id="Gabungkan dan ubah data secara otomatis menggunakan logika lookup." data-translate-en="Merge and transform data automatically using lookup logic.">Gabungkan dan ubah data secara otomatis menggunakan logika lookup.</p>
+                    <button class="btn btn-launch">
+                        <span data-translate-id="Jalankan Mesin" data-translate-en="Launch Engine">Jalankan Mesin</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- TARIFF ENGINE MODULE -->
+        <div id="tarifGeneratorApp" class="view">
+            <h2><i class="fas fa-file-invoice-dollar" style="color: var(--primary-color);"></i> Tariff Engine</h2>
+            <p class="view-subtitle" data-translate-id="Ubah daftar harga mentah menjadi format buku tarif yang rapi." data-translate-en="Transform raw price lists into formatted tariff books.">Ubah daftar harga mentah menjadi format buku tarif yang rapi.</p>
+            
+            <div id="tarifUploadStep" class="panel-section">
+                <div class="upload-area" id="tarifUploadArea">
+                    <label for="tarifFileInput" class="upload-label"><i class="fas fa-upload"></i> <span data-translate-id="Pilih Berkas Sumber" data-translate-en="Choose Source File">Pilih Berkas Sumber</span></label>
+                    <input type="file" id="tarifFileInput" accept=".xlsx,.xls">
+                    <p id="tarifFileName" style="color: var(--text-secondary); margin-top: 15px; font-weight: 500;" data-translate-id="Pilih file Excel untuk memulai" data-translate-en="Choose Excel file to start">Pilih file Excel untuk memulai</p>
+                </div>
+            </div>
+            
+            <div id="tarifLoading" class="loading" style="display: none;"></div>
+            
+            <div id="tarifControlPanel" class="panel-section" style="display: none;">
+                <div class="settings-grid">
+                    <div class="main-settings">
+                        <h4 data-translate-id="1. Konfigurasi Sumber Data" data-translate-en="1. Data Source Config"><i class="fas fa-database"></i> 1. Konfigurasi Sumber Data</h4>
+                        <div class="form-row">
+                            <label for="tarifSheetSelect" data-translate-id="Pilih Sheet" data-translate-en="Select Sheet">Pilih Sheet</label>
+                            <select id="tarifSheetSelect"></select>
+                        </div>
+                        <div class="form-row">
+                            <label for="tarifFilterColumnSelect" data-translate-id="Filter Berdasarkan (Opsional)" data-translate-en="Filter By (Optional)">Filter Berdasarkan (Opsional)</label>
+                            <select id="tarifFilterColumnSelect"></select>
+                        </div>
+                        
+                        <h4 style="margin-top: 35px;" data-translate-id="2. Pemetaan Kolom" data-translate-en="2. Column Mapping"><i class="fas fa-arrows-alt-h"></i> 2. Pemetaan Kolom</h4>
+                        <form id="tarifMappingForm"></form>
+                    </div>
+                    <div class="contextual-settings">
+                        <div id="filter-values-wrapper" style="display:none;">
+                            <h4 data-translate-id="Filter Nilai" data-translate-en="Filter Values">Filter Nilai</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -10px;" data-translate-id="Pilih nilai yang ingin diproses." data-translate-en="Select values to process.">Pilih nilai yang ingin diproses.</p>
+                            <div id="tarifFilterValuesContainer"></div>
+                        </div>
+                        <div id="class-map-wrapper" style="display:none;">
+                            <h4 data-translate-id="Pemetaan Nilai Kelas" data-translate-en="Class Value Mapping">Pemetaan Nilai Kelas</h4>
+                            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-top: -10px;" data-translate-id="Cocokkan nama kelas dari file Anda ke target standar." data-translate-en="Map class names from your file to standard targets.">Cocokkan nama kelas dari file Anda ke target standar.</p>
+                            <form id="tarifClassMappingForm"></form>
+                        </div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <button id="tarifProcessBtn" class="btn">
+                        <span class="spinner-icon"><i class="fas fa-spinner fa-spin"></i></span>
+                        <span class="btn-text"><i class="fas fa-rocket"></i> <span data-translate-id="Proses Buku Tarif" data-translate-en="Process Tariff Book">Proses Buku Tarif</span></span>
+                    </button>
+                </div>
+            </div>
+            <div id="tarifRes"></div>
+        </div>
+
+        <!-- REPORT FORGE MODULE -->
+        <div id="reportConstructorApp" class="view">
+            <h2><i class="fas fa-chart-bar" style="color: var(--primary-color);"></i> Report Forge</h2>
+            <p class="view-subtitle" data-translate-id="Bangun laporan manajemen dari data operasional mentah." data-translate-en="Build management reports from raw operational data.">Bangun laporan manajemen dari data operasional mentah.</p>
+
+            <div id="rcUploadStep" class="panel-section">
+                <div class="upload-area" id="rcUploadArea">
+                    <label for="rcFileInput" class="upload-label"><i class="fas fa-database"></i> <span data-translate-id="Pilih Berkas Data Mentah" data-translate-en="Choose Raw Data File">Pilih Berkas Data Mentah</span></label>
+                    <input type="file" id="rcFileInput" accept=".xlsx,.xls">
+                    <p id="rcFileName" class="file-name-display" style="color: var(--text-secondary); margin-top: 15px; font-weight: 500;" data-translate-id="Belum ada file dipilih" data-translate-en="No file selected yet">Belum ada file dipilih</p>
+                </div>
+            </div>
+            
+            <input type="file" id="rcTemplateInput" accept=".xlsx,.xls" style="display: none;">
+
+            <div id="rcLoading" class="loading" style="display: none;"></div>
+            
+            <div id="rcControlPanel" class="panel-section" style="display: none; padding: 0;">
+                <div id="rcTopPanel" class="rc-top-panel"></div>
+                <div id="rcWorkspace" class="rc-workspace"></div>
+                <div class="rc-footer-actions">
+                    <button id="rcProcessBtn" class="btn">
+                        <i class="fas fa-rocket"></i> <span data-translate-id="Buat Laporan" data-translate-en="Generate Report">Buat Laporan</span>
+                    </button>
+                </div>
+            </div>
+            <div id="rcRes"></div>
+        </div>
+
+        <!-- DATA ASSIMILATOR MODULE -->
+        <div id="vlookupApp" class="view">
+             <h2><i class="fas fa-database" style="color: var(--primary-color);"></i> Data Assimilator</h2>
+             <p class="view-subtitle" data-translate-id="Gabungkan data dari file template ke file utama berdasarkan kolom kunci pencocokan." data-translate-en="Merge data from a template file into a main file using a match key.">Gabungkan data dari file template ke file utama berdasarkan kolom kunci pencocokan.</p>
+
+             <div id="vlookupUploadStep" class="panel-section">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 data-translate-id="1. Unggah File Utama" data-translate-en="1. Upload Main File">1. Unggah File Utama</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82em; margin-top: -10px;" data-translate-id="File yang akan ditambahi kolom data baru." data-translate-en="File that will receive new data columns.">File yang akan ditambahi kolom data baru.</p>
+                        <div class="upload-area" id="vlookupUploadAreaMain">
+                            <label for="vlookupMainFile" class="upload-label"><i class="fas fa-file-alt"></i> <span data-translate-id="Unggah File Utama" data-translate-en="Upload Main File">Unggah File Utama</span></label>
+                            <input type="file" id="vlookupMainFile" accept=".xlsx,.xls">
+                            <p id="vlookupMainFileName" class="file-name-display" style="margin-top: 15px; font-weight: 500; color: var(--text-secondary);" data-translate-id="Belum ada file terpilih" data-translate-en="No file selected yet">Belum ada file terpilih</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 data-translate-id="2. Unggah File Template" data-translate-en="2. Upload Template File">2. Unggah File Template</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82em; margin-top: -10px;" data-translate-id="File sumber yang datanya akan diambil." data-translate-en="Source file containing target data.">File sumber yang datanya akan diambil.</p>
+                        <div class="upload-area" id="vlookupUploadAreaTemplate">
+                            <label for="vlookupTemplateFile" class="upload-label"><i class="fas fa-table"></i> <span data-translate-id="Unggah File Template" data-translate-en="Upload Template File">Unggah File Template</span></label>
+                            <input type="file" id="vlookupTemplateFile" accept=".xlsx,.xls">
+                            <p id="vlookupTemplateFileName" class="file-name-display" style="margin-top: 15px; font-weight: 500; color: var(--text-secondary);" data-translate-id="Belum ada file terpilih" data-translate-en="No file selected yet">Belum ada file terpilih</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="vlookupNextStepContainer" style="text-align: center; margin-top: 30px; display: none;">
+                    <button id="vlookupInspectBtn" class="btn">
+                        <i class="fas fa-arrow-right"></i> <span data-translate-id="Langkah Selanjutnya" data-translate-en="Next Step">Langkah Selanjutnya</span>
+                    </button>
+                </div>
+             </div>
+
+             <div id="vlookupLoading" class="loading" style="display: none;"></div>
+             <div id="vlookupControlPanel" class="panel-section" style="display: none;">
+                <div class="settings-grid">
+                    <div class="main-settings">
+                        <h4 data-translate-id="Pemetaan Kolom VLOOKUP" data-translate-en="VLOOKUP Column Mapping"><i class="fas fa-key"></i> Pemetaan Kolom VLOOKUP</h4>
+                        <form id="vlookupMappingForm"></form>
+                    </div>
+                    <div class="contextual-settings" id="vlookupHeadersPreview"></div>
+                </div>
+                <div style="text-align: center; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <button id="vlookupProcessBtn" class="btn">
+                        <span class="spinner-icon"><i class="fas fa-spinner fa-spin"></i></span>
+                        <span class="btn-text"><i class="fas fa-rocket"></i> <span data-translate-id="Jalankan VLOOKUP" data-translate-en="Run VLOOKUP">Jalankan VLOOKUP</span></span>
+                    </button>
+                </div>
+             </div>
+             <div id="vlookupRes"></div>
+        </div>
+    </main>
+
+    <footer class="app-footer">
+        <div>
+            <strong>NO MORE HUMAN v2.0</strong> <span style="opacity: 0.5; margin-left: 5px;">by rattputt</span>
+        </div>
+        <div class="footer-taglines">
+            <p>Humans are optional.</p>
+            <p style="opacity: 0.6;" data-translate-id="Preserve creativity. Automate the rest." data-translate-en="Preserve creativity. Automate the rest.">Preserve creativity. Automate the rest.</p>
+        </div>
+    </footer>
+</div>
+
+<!-- COMMON MODAL OVERLAY -->
+<div id="appModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modalTitle">Detail</h3>
+            <button id="modalCloseBtn" class="modal-close-btn">&times;</button>
+        </div>
+        <div class="modal-body" id="modalBody"></div>
+    </div>
+</div>
+
+<script src="script.js" defer></script>
+<script src="tarif-generator.js" defer></script>
+<script src="report-constructor.js" defer></script>
+<script src="vlookup-kustom.js" defer></script>
+
+</body>
+</html>
