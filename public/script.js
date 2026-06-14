@@ -443,4 +443,90 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tampilkan menu utama saat aplikasi pertama kali dimuat
     showView('mainMenu');
     runBootAnimation();
+
+    // --- SERVER WAKE-UP & POLLING LOGIC ---
+    const connectionStatusWidget = document.getElementById('connectionStatusWidget');
+    const btnWakeUpServer = document.getElementById('btnWakeUpServer');
+    let isWakeUpPolling = false;
+
+    function updateWidgetStatus(status, text = '') {
+        if (!connectionStatusWidget) return;
+        connectionStatusWidget.className = `status-badge status-${status}`;
+        
+        const textSpan = connectionStatusWidget.querySelector('.status-text');
+        if (textSpan) {
+            textSpan.textContent = text || (status === 'online' ? 'Online' : status === 'offline' ? 'Offline' : 'Menghubungkan...');
+        }
+        
+        if (btnWakeUpServer) {
+            btnWakeUpServer.style.display = status === 'offline' ? 'inline-block' : 'none';
+        }
+    }
+
+    async function checkServerConnection(isWakeUp = false) {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 4000);
+            
+            const response = await fetch(window.API_BASE_URL + '/ping', { signal: controller.signal });
+            clearTimeout(timeoutId);
+            
+            if (response.ok) {
+                updateWidgetStatus('online');
+                isWakeUpPolling = false;
+                if (isWakeUp && btnWakeUpServer) {
+                    btnWakeUpServer.disabled = false;
+                    btnWakeUpServer.innerHTML = '<i class="fas fa-plug"></i> Bangunkan';
+                }
+                return true;
+            }
+        } catch (err) {
+            // failed
+        }
+        
+        if (!isWakeUpPolling) {
+            updateWidgetStatus('offline');
+        }
+        return false;
+    }
+
+    async function pollWakeUpServer() {
+        if (isWakeUpPolling) return;
+        isWakeUpPolling = true;
+        
+        if (btnWakeUpServer) {
+            btnWakeUpServer.disabled = true;
+            btnWakeUpServer.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Membangunkan...';
+        }
+        updateWidgetStatus('loading', 'Membangunkan...');
+
+        for (let i = 0; i < 15; i++) {
+            const isOnline = await checkServerConnection(true);
+            if (isOnline) break;
+            await new Promise(resolve => setTimeout(resolve, 4000));
+        }
+
+        if (isWakeUpPolling) {
+            isWakeUpPolling = false;
+            updateWidgetStatus('offline');
+            if (btnWakeUpServer) {
+                btnWakeUpServer.disabled = false;
+                btnWakeUpServer.innerHTML = '<i class="fas fa-redo"></i> Gagal, Ulangi';
+            }
+        }
+    }
+
+    if (btnWakeUpServer) {
+        btnWakeUpServer.addEventListener('click', (e) => {
+            e.stopPropagation();
+            pollWakeUpServer();
+        });
+    }
+
+    checkServerConnection();
+    setInterval(() => {
+        if (!isWakeUpPolling) {
+            checkServerConnection();
+        }
+    }, 30000);
 });

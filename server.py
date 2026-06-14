@@ -17,6 +17,7 @@ from generate_pdf import generate_pdf_from_data
 import report_constructor_engine
 import vlookup_processor
 import validate_excel
+import harmonize_processor
 from fastapi.middleware.cors import CORSMiddleware
 
 # Track server start time for uptime calculation
@@ -510,12 +511,12 @@ def get_login_page_html(error: str = None):
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <style>
             :root {{
-                --bg-color: #080B12;
-                --panel-bg: #101827;
-                --primary-color: #0066FF;
+                --bg-color: #0B0F19;
+                --panel-bg: #151C2C;
+                --primary-color: #3B82F6;
                 --text-color: #F3F4F6;
                 --text-secondary: #9CA3AF;
-                --border-color: rgba(255, 255, 255, 0.08);
+                --border-color: rgba(255, 255, 255, 0.06);
                 --danger-color: #EF4444;
             }}
             body {{
@@ -622,7 +623,7 @@ def get_login_page_html(error: str = None):
         <div class="login-container">
             <div class="logo-wrap"><i class="fas fa-microchip"></i></div>
             <h2>NO MORE HUMAN</h2>
-            <p class="tagline">Humans are optional.</p>
+            <p class="tagline">Integrity. Speed. Precision.</p>
             <p class="sub-desc">Masukkan kata sandi untuk mengakses Status Server</p>
             {error_html}
             <form action="/admin-login" method="post">
@@ -660,20 +661,20 @@ def get_admin_dashboard_html():
     <head>
         <meta charset="utf-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Status Server - no more human!!</title>
+        <title>Status Server - NO MORE HUMAN</title>
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
         <style>
             :root {{
-                --bg-color: #080B12;
-                --panel-bg: #101827;
-                --primary-color: #0066FF;
-                --success-color: #00D084;
+                --bg-color: #0B0F19;
+                --panel-bg: #151C2C;
+                --primary-color: #3B82F6;
+                --success-color: #10B981;
                 --text-color: #F3F4F6;
                 --text-secondary: #9CA3AF;
-                --border-color: rgba(255, 255, 255, 0.08);
+                --border-color: rgba(255, 255, 255, 0.06);
             }}
             body {{
                 font-family: 'Plus Jakarta Sans', sans-serif;
@@ -879,6 +880,89 @@ def get_admin_dashboard_html():
     </body>
     </html>
     """
+
+@app.get("/ping")
+async def ping():
+    return {"ok": True}
+
+@app.post("/harmonizer-inspect")
+async def harmonizer_inspect_endpoint(
+    mainFile: UploadFile = File(...),
+    dictFile: UploadFile = File(...)
+):
+    validate_excel_mime(mainFile)
+    validate_excel_mime(dictFile)
+    
+    main_path = save_temp_file(mainFile)
+    dict_path = save_temp_file(dictFile)
+    
+    try:
+        main_wb = load_workbook(main_path, read_only=True)
+        dict_wb = load_workbook(dict_path, read_only=True)
+        
+        main_sheets_info = {}
+        for sheet in main_wb.worksheets:
+            # get first row headers
+            for row in sheet.iter_rows(max_row=1, values_only=True):
+                headers = [str(h) for h in row if h is not None]
+                main_sheets_info[sheet.title] = headers
+                break
+                
+        dict_sheets_info = {}
+        for sheet in dict_wb.worksheets:
+            for row in sheet.iter_rows(max_row=1, values_only=True):
+                headers = [str(h) for h in row if h is not None]
+                dict_sheets_info[sheet.title] = headers
+                break
+                
+        return {
+            "ok": True,
+            "mainSheets": list(main_sheets_info.keys()),
+            "mainHeadersBySheet": main_sheets_info,
+            "dictSheets": list(dict_sheets_info.keys()),
+            "dictHeadersBySheet": dict_sheets_info
+        }
+    except Exception as e:
+        return JSONResponse(status_code=400, content={'ok': False, 'error': str(e)})
+    finally:
+        delete_file(main_path)
+        delete_file(dict_path)
+
+@app.post("/harmonizer-process")
+async def harmonizer_process_endpoint(
+    mainFile: UploadFile = File(...),
+    dictFile: UploadFile = File(...),
+    config: str = Form(...)
+):
+    validate_excel_mime(mainFile)
+    validate_excel_mime(dictFile)
+    
+    main_path = save_temp_file(mainFile)
+    dict_path = save_temp_file(dictFile)
+    
+    try:
+        config_data = json.loads(config)
+        result_path, diagnostics = harmonize_processor.process_harmonization(main_path, dict_path, config_data, OUTPUT_DIR)
+        
+        # Read and encode to Base64
+        with open(result_path, "rb") as f:
+            excel_base64 = base64.b64encode(f.read()).decode('utf-8')
+            
+        is_local = not os.environ.get("RENDER")
+        excel_url = f"/output/{os.path.basename(result_path)}" if is_local else None
+        
+        return {
+            "ok": True,
+            "excel": excel_url,
+            "excelData": excel_base64,
+            "excelFilename": f"harmonized_{mainFile.filename}",
+            "diagnostics": diagnostics
+        }
+    except Exception as e:
+        return JSONResponse(status_code=400, content={'ok': False, 'error': str(e)})
+    finally:
+        delete_file(main_path)
+        delete_file(dict_path)
 
 @app.get("/", response_class=HTMLResponse)
 async def get_root(request: Request):

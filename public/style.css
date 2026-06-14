@@ -1,24 +1,21 @@
-/* CSS Variabel - AI Command Center */
+/* CSS Variabel - Operations Portal */
 :root {
-    --bg-color: #080B12;
-    --surface-color: #101827;
-    --primary-color: #0066FF;
-    --success-color: #00D084;
+    --bg-color: #0B0F19;
+    --surface-color: #151C2C;
+    --primary-color: #3B82F6;
+    --success-color: #10B981;
     --danger-color: #EF4444;
     --text-primary: #FFFFFF;
     --text-secondary: #94A3B8;
-    --border-color: rgba(255, 255, 255, 0.08);
-    --border-hover: rgba(0, 102, 255, 0.4);
+    --border-color: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(59, 130, 246, 0.35);
     --font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
 }
 
 body {
     background-color: var(--bg-color);
-    background-image: 
-        radial-gradient(at 50% 0%, rgba(0, 102, 255, 0.12) 0px, transparent 50%),
-        linear-gradient(rgba(255, 255, 255, 0.007) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.007) 1px, transparent 1px);
-    background-size: 100% 100%, 30px 30px, 30px 30px;
+    background-image: radial-gradient(at 50% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 60%);
+    background-size: 100% 100%;
     background-attachment: fixed;
     color: var(--text-primary);
     font-family: var(--font-family);
@@ -146,6 +143,34 @@ body {
     border-radius: 50%;
     box-shadow: 0 0 8px var(--success-color);
     animation: pulse 2s infinite;
+}
+
+.status-badge.status-loading {
+    background: rgba(234, 179, 8, 0.08) !important;
+    border: 1px solid rgba(234, 179, 8, 0.2) !important;
+    color: #EAB308 !important;
+}
+.status-badge.status-loading .badge-dot {
+    background-color: #EAB308 !important;
+    box-shadow: 0 0 8px #EAB308 !important;
+}
+.status-badge.status-online {
+    background: rgba(16, 185, 129, 0.08) !important;
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+    color: var(--success-color) !important;
+}
+.status-badge.status-online .badge-dot {
+    background-color: var(--success-color) !important;
+    box-shadow: 0 0 8px var(--success-color) !important;
+}
+.status-badge.status-offline {
+    background: rgba(239, 68, 68, 0.08) !important;
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
+    color: var(--danger-color) !important;
+}
+.status-badge.status-offline .badge-dot {
+    background-color: var(--danger-color) !important;
+    box-shadow: 0 0 8px var(--danger-color) !important;
 }
 @keyframes pulse {
     0% { transform: scale(1); opacity: 1; }

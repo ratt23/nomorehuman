@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>no more human!! - AI Command Center</title>
+    <title>NO MORE HUMAN - Operations Portal</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,8 +22,12 @@
 
 <div class="container">
     <header class="app-header">
-        <h2><i class="fas fa-microchip" style="color: var(--primary-color);"></i> no more human!!</h2>
+        <h2><i class="fas fa-network-wired" style="color: var(--primary-color);"></i> NO MORE HUMAN</h2>
         <div style="display: flex; align-items: center; gap: 15px;">
+            <div id="connectionStatusWidget" class="status-badge status-loading" style="background: rgba(234, 179, 8, 0.1); border: 1px solid rgba(234, 179, 8, 0.2); color: #EAB308;">
+                <span class="badge-dot" style="background: #EAB308;"></span> <span class="status-text">Menghubungkan...</span>
+                <button id="btnWakeUpServer" class="btn" style="display: none; margin-left: 8px; padding: 2px 8px; font-size: 0.7rem; border-radius: 4px; background: var(--primary-color);"><i class="fas fa-plug"></i> Bangunkan</button>
+            </div>
             <button class="btn-lang" id="langBtn"><i class="fas fa-globe"></i> <span>EN</span></button>
             <button class="btn btn-secondary" id="backToMenuBtn" style="display: none;">
                 <i class="fas fa-arrow-left"></i> <span data-translate-id="Menu Utama" data-translate-en="Main Menu">Menu Utama</span>
@@ -37,12 +41,12 @@
             <!-- HERO SECTION -->
             <div class="hero-section">
                 <div class="status-badge">
-                    <span class="badge-dot"></span> <span data-translate-id="Inti Otomatisasi Aktif" data-translate-en="Automation Core Online">Inti Otomatisasi Aktif</span>
+                    <span class="badge-dot"></span> <span data-translate-id="Sistem Operasional Aktif" data-translate-en="Operations System Online">Sistem Operasional Aktif</span>
                 </div>
                 <h1 class="hero-title">NO MORE HUMAN</h1>
-                <p class="hero-tagline">Humans are optional.</p>
+                <p class="hero-tagline">Integrity. Speed. Precision.</p>
                 <p class="hero-desc">
-                    <span data-translate-id="Ubah alur kerja berulang menjadi kecerdasan otomatis." data-translate-en="Transform repetitive workflows into automated intelligence.">Ubah alur kerja berulang menjadi kecerdasan otomatis.</span>
+                    <span data-translate-id="Otomatisasi berkas operasional dan penyelarasan buku tarif." data-translate-en="Operational file automation and tariff book harmonization.">Otomatisasi berkas operasional dan penyelarasan buku tarif.</span>
                     <span style="opacity: 0.5; display: block; margin-top: 6px; font-size: 0.85rem; font-family: monospace;">by rattputt</span>
                 </p>
             </div>
@@ -65,7 +69,7 @@
                 <div class="module-card menu-choice" data-target="tarifGeneratorApp">
                     <div class="module-icon-wrap"><i class="fas fa-file-invoice-dollar"></i></div>
                     <h3 class="module-title">Tariff Engine</h3>
-                    <p class="module-desc" data-translate-id="Buat dan format buku tarif rumah sakit secara otomatis." data-translate-en="Generate and format hospital tariff books automatically.">Buat dan format buku tarif rumah sakit secara otomatis.</p>
+                    <p class="module-desc" data-translate-id="Buat dan format buku tarif secara otomatis." data-translate-en="Generate and format tariff books automatically.">Buat dan format buku tarif secara otomatis.</p>
                     <button class="btn btn-launch">
                         <span data-translate-id="Jalankan Mesin" data-translate-en="Launch Engine">Jalankan Mesin</span> <i class="fas fa-arrow-right"></i>
                     </button>
@@ -88,6 +92,16 @@
                     <p class="module-desc" data-translate-id="Gabungkan dan ubah data secara otomatis menggunakan logika lookup." data-translate-en="Merge and transform data automatically using lookup logic.">Gabungkan dan ubah data secara otomatis menggunakan logika lookup.</p>
                     <button class="btn btn-launch">
                         <span data-translate-id="Jalankan Mesin" data-translate-en="Launch Engine">Jalankan Mesin</span> <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+
+                <!-- Data Harmonizer -->
+                <div class="module-card menu-choice" data-target="harmonizerApp">
+                    <div class="module-icon-wrap"><i class="fas fa-sliders-h"></i></div>
+                    <h3 class="module-title">Data Harmonizer</h3>
+                    <p class="module-desc" data-translate-id="Penyelarasan kolom, pembaruan kode dan nama, serta penyaringan baris otomatis." data-translate-en="Align columns, update codes and names, and filter rows automatically.">Penyelarasan kolom, pembaruan kode dan nama, serta penyaringan baris otomatis.</p>
+                    <button class="btn btn-launch">
+                        <span data-translate-id="Buka Modul" data-translate-en="Open Module">Buka Modul</span> <i class="fas fa-arrow-right"></i>
                     </button>
                 </div>
             </div>
@@ -232,6 +246,124 @@
              </div>
              <div id="vlookupRes"></div>
         </div>
+
+        <!-- DATA HARMONIZER MODULE -->
+        <div id="harmonizerApp" class="view">
+             <h2><i class="fas fa-sliders-h" style="color: var(--primary-color);"></i> Data Harmonizer</h2>
+             <p class="view-subtitle" data-translate-id="Penyelarasan kolom data, perubahan kode & nama, serta penghapusan item menggunakan kamus acuan." data-translate-en="Align data columns, modify codes & names, and delete items using a reference dictionary.">Penyelarasan kolom data, perubahan kode & nama, serta penghapusan item menggunakan kamus acuan.</p>
+
+             <div id="harmonizerUploadStep" class="panel-section">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div>
+                        <h4 data-translate-id="1. Unggah Berkas Utama" data-translate-en="1. Upload Main File">1. Unggah Berkas Utama</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82em; margin-top: -10px;" data-translate-id="File data lokal yang ingin diselaraskan." data-translate-en="Local data file to be reconciled.">File data lokal yang ingin diselaraskan.</p>
+                        <div class="upload-area" id="harmonizerUploadAreaMain">
+                            <label for="harmonizerMainFile" class="upload-label"><i class="fas fa-file-alt"></i> <span data-translate-id="Unggah Berkas Utama" data-translate-en="Upload Main File">Unggah Berkas Utama</span></label>
+                            <input type="file" id="harmonizerMainFile" accept=".xlsx,.xls">
+                            <p id="harmonizerMainFileName" class="file-name-display" style="margin-top: 15px; font-weight: 500; color: var(--text-secondary);" data-translate-id="Belum ada file terpilih" data-translate-en="No file selected yet">Belum ada file terpilih</p>
+                            <p style="font-size: 0.75rem; opacity: 0.5; margin-top: 5px;" data-translate-id="Batas: 10 MB" data-translate-en="Limit: 10 MB">Batas: 10 MB</p>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 data-translate-id="2. Unggah Berkas Kamus Acuan" data-translate-en="2. Upload Dictionary File">2. Unggah Berkas Kamus Acuan</h4>
+                        <p style="color: var(--text-secondary); font-size: 0.82em; margin-top: -10px;" data-translate-id="File daftar instruksi perubahan dari kantor pusat." data-translate-en="Instruction file from head office.">File daftar instruksi perubahan dari kantor pusat.</p>
+                        <div class="upload-area" id="harmonizerUploadAreaDict">
+                            <label for="harmonizerDictFile" class="upload-label"><i class="fas fa-table"></i> <span data-translate-id="Unggah Berkas Kamus" data-translate-en="Upload Dictionary File">Unggah Berkas Kamus</span></label>
+                            <input type="file" id="harmonizerDictFile" accept=".xlsx,.xls">
+                            <p id="harmonizerDictFileName" class="file-name-display" style="margin-top: 15px; font-weight: 500; color: var(--text-secondary);" data-translate-id="Belum ada file terpilih" data-translate-en="No file selected yet">Belum ada file terpilih</p>
+                            <p style="font-size: 0.75rem; opacity: 0.5; margin-top: 5px;" data-translate-id="Batas: 10 MB" data-translate-en="Limit: 10 MB">Batas: 10 MB</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="harmonizerNextStepContainer" style="text-align: center; margin-top: 30px; display: none;">
+                    <button id="harmonizerInspectBtn" class="btn">
+                        <i class="fas fa-arrow-right"></i> <span data-translate-id="Langkah Selanjutnya" data-translate-en="Next Step">Langkah Selanjutnya</span>
+                    </button>
+                </div>
+             </div>
+
+             <div id="harmonizerLoading" class="loading" style="display: none;"></div>
+             
+             <div id="harmonizerControlPanel" class="panel-section" style="display: none;">
+                <div class="settings-grid">
+                    <div class="main-settings">
+                        <h4 data-translate-id="Konfigurasi Penyelarasan" data-translate-en="Alignment Configuration"><i class="fas fa-sliders-h"></i> Konfigurasi Penyelarasan</h4>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                            <div class="form-row">
+                                <label for="harmonizerMainSheetSelect" data-translate-id="Sheet Berkas Utama" data-translate-en="Main File Sheet">Sheet Berkas Utama</label>
+                                <select id="harmonizerMainSheetSelect"></select>
+                            </div>
+                            <div class="form-row">
+                                <label for="harmonizerDictSheetSelect" data-translate-id="Sheet Berkas Kamus" data-translate-en="Dictionary File Sheet">Sheet Berkas Kamus</label>
+                                <select id="harmonizerDictSheetSelect"></select>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="margin-bottom: 25px;">
+                            <label for="harmonizerMatchBasis" data-translate-id="Dasar Pencocokan Data (Search Basis)" data-translate-en="Matching Basis (Search Basis)">Dasar Pencocokan Data (Search Basis)</label>
+                            <select id="harmonizerMatchBasis">
+                                <option value="code" data-translate-id="Berdasarkan Kode Saja" data-translate-en="Based on Code Only">Berdasarkan Kode Saja</option>
+                                <option value="name" data-translate-id="Berdasarkan Nama Saja" data-translate-en="Based on Name Only">Berdasarkan Nama Saja</option>
+                                <option value="both" data-translate-id="Berdasarkan Kode & Nama (Pencocokan Ganda)" data-translate-en="Based on Code & Name (Dual Matching)">Berdasarkan Kode & Nama (Pencocokan Ganda)</option>
+                            </select>
+                        </div>
+
+                        <div id="harmonizerKeyColumnsWrapper" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px;">
+                        </div>
+
+                        <h4 style="margin-top: 30px; margin-bottom: 15px;"><i class="fas fa-edit"></i> Pemetaan Pembaruan & Proteksi</h4>
+                        <div class="form-row" style="margin-bottom: 20px;">
+                            <label for="harmonizerPriceColumns" data-translate-id="Kolom Harga yang Diproteksi (Pisahkan dengan koma)" data-translate-en="Protected Price Columns (Comma separated)">Kolom Harga yang Diproteksi (Pisahkan dengan koma)</label>
+                            <input type="text" id="harmonizerPriceColumns" placeholder="Harga, Tarif, Nilai" value="Harga, Tarif">
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+                                <input type="checkbox" id="harmonizerHighlightChanges" checked style="width: auto;">
+                                <span data-translate-id="Sorot/Highlight Perubahan dengan Warna Kuning" data-translate-en="Highlight Changes with Yellow Background">Sorot/Highlight Perubahan dengan Warna Kuning</span>
+                            </label>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+                                <input type="checkbox" id="harmonizerDeleteMatched" style="width: auto;">
+                                <span data-translate-id="Hapus baris jika data cocok di Kamus Acuan (Gunakan sebagai Daftar Penghapusan)" data-translate-en="Delete row if data matches in Reference Dictionary (Use as Exclusion List)">Hapus baris jika data cocok di Kamus Acuan (Gunakan sebagai Daftar Penghapusan)</span>
+                            </label>
+                        </div>
+
+                        <div id="harmonizerUpdateSection">
+                            <h5 style="margin-bottom: 10px; font-size: 0.9rem;" data-translate-id="Peta Pembaruan Kolom" data-translate-en="Column Update Mapping">Peta Pembaruan Kolom</h5>
+                            <div class="mapping-container" id="harmonizerMappingContainer"></div>
+                            <div class="mapping-toolbar" style="margin-top: 10px;">
+                                <button type="button" class="btn btn-secondary" id="harmonizerAddMappingBtn"><i class="fas fa-plus"></i> <span data-translate-id="Tambah Aturan Pembaruan" data-translate-en="Add Update Rule">Tambah Aturan Pembaruan</span></button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row" style="margin-top: 25px;">
+                            <label for="harmonizerSortColumn" data-translate-id="Urutkan Hasil Akhir Berdasarkan Kolom" data-translate-en="Sort Final Result By Column">Urutkan Hasil Akhir Berdasarkan Kolom</label>
+                            <select id="harmonizerSortColumn"></select>
+                        </div>
+                        <div class="form-row">
+                            <label for="harmonizerSortOrder" data-translate-id="Arah Urutan" data-translate-en="Sort Direction">Arah Urutan</label>
+                            <select id="harmonizerSortOrder">
+                                <option value="asc" data-translate-id="Terkecil ke Terbesar (A-Z)" data-translate-en="Smallest to Largest (A-Z)">Terkecil ke Terbesar (A-Z)</option>
+                                <option value="desc" data-translate-id="Terbesar ke Terkecil (Z-A)" data-translate-en="Largest to Smallest (Z-A)">Terbesar ke Terkecil (Z-A)</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                    <button id="harmonizerProcessBtn" class="btn">
+                        <span class="spinner-icon"><i class="fas fa-spinner fa-spin"></i></span>
+                        <span class="btn-text"><i class="fas fa-rocket"></i> <span data-translate-id="Jalankan Penyelarasan" data-translate-en="Run Harmonizer">Jalankan Penyelarasan</span></span>
+                    </button>
+                </div>
+             </div>
+             <div id="harmonizerRes"></div>
+        </div>
     </main>
 
     <footer class="app-footer">
@@ -260,6 +392,7 @@
 <script src="tarif-generator.js" defer></script>
 <script src="report-constructor.js" defer></script>
 <script src="vlookup-kustom.js" defer></script>
+<script src="data-harmonizer.js" defer></script>
 
 </body>
 </html>
